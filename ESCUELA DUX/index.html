@@ -11,461 +11,48 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="public/assets/images/logo-escuela-dux.png">
   
-  <!-- CSS - Orden de carga importante -->
-  <!-- 1. Variables y tokens de diseño -->
+  <!-- CSS - Sistema modular -->
   <link rel="stylesheet" href="src/styles/variables.css">
-  <!-- 2. Estilos base y reset -->
   <link rel="stylesheet" href="src/styles/base.css">
-  <!-- 3. Bootstrap (framework) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- 4. Componentes personalizados -->
   <link rel="stylesheet" href="src/styles/components.css">
-  <!-- 5. Layout y estructura -->
   <link rel="stylesheet" href="src/styles/layout.css">
-  <!-- 6. Estilos de páginas específicas -->
   <link rel="stylesheet" href="src/styles/pages.css">
+  <link rel="stylesheet" href="src/styles/admin.css">
   
-  <!-- jQuery (requerido por Bootstrap modals) -->
+  <!-- Dependencies -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- HTML2PDF para generación de PDFs -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
   <!-- ============================================
-       NAVBAR - Navegación principal
+       NAVBAR CONTAINER - Inyección dinámica
        ============================================ -->
-  <nav class="navbar navbar-dark bg-black py-2" role="navigation" aria-label="Navegación principal">
-    <div class="container-fluid">
-      <a class="navbar-brand d-flex align-items-center gap-2" href="#" aria-label="Inicio">
-        <img src="public/assets/images/logo-escuela-dux.png" alt="Logo Escuela DUX" height="36">
-        <span class="fw-bold text-danger">Escuela DUX</span>
-      </a>
-      <button class="btn btn-danger rounded-pill ms-auto" id="inscripcionBtn" type="button">
-        Inscribirse a un curso
-      </button>
-    </div>
-  </nav>
+  <div id="navbar-container"></div>
 
   <!-- ============================================
-       HOME - Pantalla de inicio con login
+       APP CONTAINER - Contenedor principal SPA
        ============================================ -->
-  <main class="container-fluid home-split min-vh-100 d-flex align-items-center justify-content-center">
-    <article class="row w-100 home-card shadow-lg overflow-hidden rounded-4">
-      
-      <!-- Columna izquierda: Bienvenida -->
-      <section class="col-md-6 d-flex flex-column align-items-center justify-content-center p-5 home-left position-relative">
-        <div class="home-bg" aria-hidden="true"></div>
-        <div class="position-relative z-2 text-center w-100">
-          <img 
-            src="public/assets/images/logo-escuela-dux.png" 
-            alt="Logo Escuela DUX" 
-            class="logo-hero mb-4" 
-            style="background:transparent;box-shadow:none;width:120px;"
-          >
-          <h1 class="fw-bold text-white mb-3 h2">¡Bienvenido a Escuela DUX!</h1>
-          <p class="text-light mb-0 fs-5">
-            Palabras que transforman,<br>historias que perduran.
-          </p>
+  <div id="app-container">
+    <!-- Loading inicial -->
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+      <div class="text-center">
+        <div class="spinner-border text-danger mb-3" role="status">
+          <span class="visually-hidden">Cargando...</span>
         </div>
-      </section>
-
-      <!-- Columna derecha: Login/Registro -->
-      <section class="col-md-6 bg-white home-bg-img d-flex flex-column justify-content-center p-5">
-        <div class="d-flex justify-content-center mb-4 gap-2">
-          <button class="btn btn-danger rounded-pill" id="inscripcionBtn" type="button">
-            Inscribirse a un curso
-          </button>
-        </div>
-
-        <!-- Tabs de navegación -->
-        <ul class="nav nav-pills mb-4 justify-content-center" id="pills-tab" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button 
-              class="nav-link active" 
-              id="pills-login-tab" 
-              data-bs-toggle="pill" 
-              data-bs-target="#pills-login" 
-              type="button" 
-              role="tab" 
-              aria-controls="pills-login" 
-              aria-selected="true"
-            >
-              Iniciar Sesión
-            </button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button 
-              class="nav-link" 
-              id="pills-register-tab" 
-              data-bs-toggle="pill" 
-              data-bs-target="#pills-register" 
-              type="button" 
-              role="tab" 
-              aria-controls="pills-register" 
-              aria-selected="false"
-            >
-              Registrarse
-            </button>
-          </li>
-        </ul>
-
-        <div class="tab-content" id="pills-tabContent">
-          <!-- Tab: Login -->
-          <div 
-            class="tab-pane fade show active" 
-            id="pills-login" 
-            role="tabpanel" 
-            aria-labelledby="pills-login-tab"
-          >
-            <div class="alert alert-secondary small mb-3" role="alert">
-              <strong>Usuarios de prueba:</strong><br>
-              <span class="d-block">Alumno: <code>alumno@dux.com</code> / Contraseña: <code>1234</code></span>
-              <span class="d-block">Profesor: <code>profesor@dux.com</code> / Contraseña: <code>1234</code></span>
-            </div>
-            <form id="formLoginHome" novalidate>
-              <div class="mb-3">
-                <label for="loginEmailHome" class="visually-hidden">Correo electrónico</label>
-                <input 
-                  type="email" 
-                  class="form-control form-control-lg" 
-                  id="loginEmailHome" 
-                  placeholder="Correo electrónico" 
-                  required
-                  autocomplete="email"
-                >
-              </div>
-              <div class="mb-3">
-                <label for="loginPasswordHome" class="visually-hidden">Contraseña</label>
-                <input 
-                  type="password" 
-                  class="form-control form-control-lg" 
-                  id="loginPasswordHome" 
-                  placeholder="Contraseña" 
-                  required
-                  autocomplete="current-password"
-                >
-              </div>
-              <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="keepSignedInHome">
-                <label class="form-check-label text-secondary" for="keepSignedInHome">
-                  Mantener sesión iniciada
-                </label>
-              </div>
-              <button type="submit" class="btn btn-danger btn-lg w-100 rounded-pill">
-                Acceder
-              </button>
-            </form>
-          </div>
-
-          <!-- Tab: Registro -->
-          <div 
-            class="tab-pane fade" 
-            id="pills-register" 
-            role="tabpanel" 
-            aria-labelledby="pills-register-tab"
-          >
-            <form id="formRegisterHome" novalidate>
-              <div class="mb-3">
-                <label for="registerEmailHome" class="visually-hidden">Correo electrónico</label>
-                <input 
-                  type="email" 
-                  class="form-control form-control-lg" 
-                  id="registerEmailHome" 
-                  placeholder="Correo electrónico" 
-                  required
-                  autocomplete="email"
-                >
-              </div>
-              <div class="mb-3">
-                <label for="registerPasswordHome" class="visually-hidden">Contraseña</label>
-                <input 
-                  type="password" 
-                  class="form-control form-control-lg" 
-                  id="registerPasswordHome" 
-                  placeholder="Contraseña" 
-                  required
-                  autocomplete="new-password"
-                >
-              </div>
-              <div class="mb-3">
-                <label for="registerTipoHome" class="visually-hidden">Tipo de usuario</label>
-                <select class="form-select form-select-lg" id="registerTipoHome" required>
-                  <option value="">Selecciona tipo de usuario</option>
-                  <option value="alumno">Alumno</option>
-                  <option value="profesor">Profesor</option>
-                </select>
-              </div>
-              <button type="submit" class="btn btn-danger btn-lg w-100 rounded-pill">
-                Registrarse
-              </button>
-            </form>
-          </div>
-        </div>
-      </section>
-    </article>
-  </main>
-
-  <!-- ============================================
-       PANELES DE USUARIO (ocultos por defecto)
-       ============================================ -->
-  <main class="container my-5">
-    
-    <!-- Panel del Alumno -->
-    <section id="alumnoPanel" class="d-none" aria-label="Panel del alumno">
-      <div class="student-layout">
-        <!-- Sidebar del alumno -->
-        <nav class="student-sidebar" aria-label="Menú del alumno">
-          <div class="sidebar-logo mb-4 mt-3 text-center">
-            <div class="sidebar-logo-bg">
-              <img src="public/assets/images/logo-escuela-dux.png" alt="Logo Escuela DUX">
-            </div>
-          </div>
-          <ul class="sidebar-menu nav flex-column gap-2">
-            <li class="nav-item">
-              <a class="nav-link active" data-section="clases" href="#" role="button">
-                <span class="sidebar-icon" aria-hidden="true">🎥</span> Clases grabadas
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-section="material" href="#" role="button">
-                <span class="sidebar-icon" aria-hidden="true">📄</span> Material escrito
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-section="plantillas" href="#" role="button">
-                <span class="sidebar-icon" aria-hidden="true">📑</span> Plantillas
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-section="horario" href="#" role="button">
-                <span class="sidebar-icon" aria-hidden="true">🕒</span> Horario en vivo
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-section="link" href="#" role="button">
-                <span class="sidebar-icon" aria-hidden="true">🔗</span> Link en vivo
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-section="tareas" href="#" role="button">
-                <span class="sidebar-icon" aria-hidden="true">📝</span> Tareas
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-section="notas" href="#" role="button">
-                <span class="sidebar-icon" aria-hidden="true">📊</span> Notas
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-section="certificado" href="#" role="button">
-                <span class="sidebar-icon" aria-hidden="true">🎓</span> Certificado
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-section="preguntas" href="#" role="button">
-                <span class="sidebar-icon" aria-hidden="true">❓</span> Preguntas al profesor
-              </a>
-            </li>
-          </ul>
-        </nav>
-
-        <!-- Contenido principal del alumno -->
-        <div class="student-main">
-          <header class="student-header d-flex justify-content-between align-items-center p-3 mb-4">
-            <div></div>
-            <div class="d-flex align-items-center gap-3">
-              <span class="fw-bold">Alumno(a)</span>
-              <img src="public/assets/images/avatar-alumno.png" alt="Avatar del alumno" class="student-avatar-img">
-              <a href="#" class="btn btn-outline-danger btn-sm" id="logoutBtnAlumno">Cerrar sesión</a>
-            </div>
-          </header>
-          <div id="studentContent" class="student-content">
-            <div class="card shadow-sm p-4">
-              <h2 class="text-danger h3">¡Bienvenido al Panel del Alumno!</h2>
-              <p>Selecciona una sección del menú para comenzar.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Panel del Profesor -->
-    <section id="profesorPanel" class="d-none" aria-label="Panel del profesor">
-      <div class="prof-layout">
-        <!-- Sidebar del profesor -->
-        <nav class="prof-sidebar" aria-label="Menú del profesor">
-          <div class="sidebar-logo mb-4 mt-3 text-center">
-            <div class="sidebar-logo-bg">
-              <img src="public/assets/images/logo-escuela-dux.png" alt="Logo Escuela DUX">
-            </div>
-          </div>
-          <ul class="sidebar-menu nav flex-column gap-2">
-            <li class="nav-item">
-              <a class="nav-link active" data-section="clases" href="#" role="button">
-                <span class="sidebar-icon" aria-hidden="true">📚</span> Subir clases escritas
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-section="tareas" href="#" role="button">
-                <span class="sidebar-icon" aria-hidden="true">📝</span> Preparar tareas
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-section="alumnos" href="#" role="button">
-                <span class="sidebar-icon" aria-hidden="true">👥</span> Lista de alumnos
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-section="dudas" href="#" role="button">
-                <span class="sidebar-icon" aria-hidden="true">💬</span> Responder dudas
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-section="evaluar" href="#" role="button">
-                <span class="sidebar-icon" aria-hidden="true">⭐</span> Evaluar alumnos
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-section="aprobar" href="#" role="button">
-                <span class="sidebar-icon" aria-hidden="true">✅</span> Aprobar/rechazar curso
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-section="en_vivo" href="#" role="button">
-                <span class="sidebar-icon" aria-hidden="true">🔴</span> Iniciar clases en vivo
-              </a>
-            </li>
-          </ul>
-        </nav>
-
-        <!-- Contenido principal del profesor -->
-        <div class="prof-main">
-          <header class="prof-header d-flex justify-content-between align-items-center p-3 mb-4">
-            <div></div>
-            <div class="d-flex align-items-center gap-3">
-              <span class="fw-bold">Profesor(a)</span>
-              <img src="public/assets/images/avatar-alumno.png" alt="Avatar del profesor" class="student-avatar-img">
-              <a href="#" class="btn btn-outline-danger btn-sm" id="logoutBtnProfesor">Cerrar sesión</a>
-            </div>
-          </header>
-          <div id="profContent" class="prof-content">
-            <div class="card shadow-sm p-4">
-              <h2 class="text-danger h3">¡Bienvenido al Panel del Profesor!</h2>
-              <p>Selecciona una sección del menú para comenzar.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Panel Administrativo -->
-    <section id="adminSection" class="d-none" aria-label="Panel administrativo">
-      <h2 class="text-danger">Panel Administrativo</h2>
-      <ul class="list-group mb-3">
-        <li class="list-group-item">Lista de alumnos</li>
-        <li class="list-group-item">Datos de los alumnos</li>
-        <li class="list-group-item">Fechas y medios de pago</li>
-        <li class="list-group-item">Facturas de pago</li>
-        <li class="list-group-item">Recordar pagos</li>
-        <li class="list-group-item">Gestionar acceso</li>
-        <li class="list-group-item">Crear nuevos alumnos/profesores/talleres</li>
-      </ul>
-    </section>
-
-    <!-- Info de usuario y logout (visible cuando hay sesión) -->
-    <div class="d-none" id="navUserHome">
-      <span class="fw-bold" id="userTypeHome"></span>
-      <a href="#" class="text-danger fw-bold ms-3" id="logoutBtnHome">Cerrar sesión</a>
-    </div>
-  </main>
-
-  <!-- ============================================
-       MODAL: Inscripción a Cursos
-       ============================================ -->
-  <div class="modal fade" id="inscripcionModal" tabindex="-1" aria-labelledby="inscripcionModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header bg-danger text-white">
-          <h3 class="modal-title h5" id="inscripcionModalLabel">Inscripción a Curso</h3>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
-          <form id="formInscripcion" novalidate>
-            <div class="mb-3">
-              <label for="curso" class="form-label">Curso</label>
-              <select class="form-select" id="curso" required>
-                <option value="">Selecciona un curso</option>
-                <option value="escritura_creativa">Escritura creativa</option>
-                <option value="edicion_estilo">Edición y corrección de estilo</option>
-                <option value="redaccion">Redacción</option>
-                <option value="narracion">Narración</option>
-                <option value="diccion_voz">Dicción, voz y oratoria</option>
-                <option value="lector_editorial">Lector Editorial</option>
-                <option value="escritura_creativa_presencial">Escritura creativa (Presencial)</option>
-              </select>
-            </div>
-
-            <!-- Detalles del curso seleccionado -->
-            <div class="mb-3 d-none" id="detallesCurso">
-              <div class="card card-body bg-light border border-danger">
-                <p class="mb-1"><strong>Turno:</strong> <span id="detalleTurno"></span></p>
-                <p class="mb-1"><strong>Días:</strong> <span id="detalleDias"></span></p>
-                <p class="mb-1"><strong>Horario:</strong> <span id="detalleHorario"></span></p>
-                <p class="mb-1"><strong>Total de clases:</strong> <span id="detalleTotalClases"></span></p>
-                <p class="mb-1"><strong>Horas de clases:</strong> <span id="detalleHoras"></span></p>
-                <p class="mb-1"><strong>Profesor:</strong> <span id="detalleProfesor"></span></p>
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <label for="nombre" class="form-label">Nombre completo</label>
-              <input type="text" class="form-control" id="nombre" required autocomplete="name">
-            </div>
-            <div class="mb-3">
-              <label for="email" class="form-label">Correo electrónico</label>
-              <input type="email" class="form-control" id="email" required autocomplete="email">
-            </div>
-            <div class="mb-3">
-              <label for="pago" class="form-label">Método de pago</label>
-              <select class="form-select" id="pago" required>
-                <option value="">Selecciona un método</option>
-                <option value="tarjeta">Tarjeta</option>
-                <option value="transferencia">Transferencia</option>
-              </select>
-            </div>
-            <button type="submit" class="btn btn-danger w-100">
-              Generar Planilla de Inscripción
-            </button>
-          </form>
-        </div>
+        <p class="text-muted">Cargando Escuela DUX...</p>
       </div>
     </div>
   </div>
 
   <!-- ============================================
-       MODAL: Previsualización de Planilla
+       MODALS CONTAINER - Inyección dinámica
        ============================================ -->
-  <div class="modal fade" id="planillaModal" tabindex="-1" aria-labelledby="planillaModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-      <div class="modal-content">
-        <div class="modal-header bg-danger text-white">
-          <h3 class="modal-title h5" id="planillaModalLabel">Planilla de Inscripción</h3>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body p-4">
-          <button class="btn btn-outline-danger mb-3 float-end" id="descargarPDF" type="button">
-            <strong>Descargar PDF</strong>
-          </button>
-          <div id="planillaPreview" aria-live="polite"></div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <div id="modals-container"></div>
 
   <!-- ============================================
-       SCRIPTS - Módulos ES6
+       SCRIPT - Punto de entrada ES6 Modules
        ============================================ -->
   <script type="module" src="src/js/main.js"></script>
 </body>

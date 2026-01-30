@@ -5,8 +5,9 @@
 
 import { TEST_USERS, USER_ROLES, DOM_SELECTORS } from '../core/config.js';
 import { appState } from '../core/state.js';
-import { $, getValue, showAlert, removeAlert, resetForm } from '../utils/dom.js';
-import { isValidEmail, isNotEmpty } from '../utils/validators.js';
+import { router } from '../core/router.js';
+import { $, getValue, showAlert, removeAlert, resetForm, delegate } from '../utils/dom.js';
+import { validateLoginForm, validateRegisterForm } from '../utils/validators.js';
 
 /**
  * Clase AuthModule - Gestiona la autenticación de usuarios
@@ -26,47 +27,53 @@ class AuthModule {
     if (this.#initialized) return;
     this.#bindEvents();
     this.#initialized = true;
+    console.log('[AuthModule] Inicializado');
   }
 
   /**
-   * Vincula eventos de autenticación
+   * Vincula eventos de autenticación usando delegación
    * @private
    */
   #bindEvents() {
-    // Login Form
-    const loginForm = $(DOM_SELECTORS.LOGIN_FORM);
-    if (loginForm) {
-      loginForm.addEventListener('submit', (e) => this.#handleLogin(e));
-    }
+    // Login Form (delegación desde document para SPA)
+    delegate(document, 'submit', '#formLoginHome', (e) => {
+      e.preventDefault();
+      this.#handleLogin();
+    });
 
     // Register Form
-    const registerForm = $(DOM_SELECTORS.REGISTER_FORM);
-    if (registerForm) {
-      registerForm.addEventListener('submit', (e) => this.#handleRegister(e));
-    }
+    delegate(document, 'submit', '#formRegisterHome', (e) => {
+      e.preventDefault();
+      this.#handleRegister();
+    });
 
-    // Logout buttons (delegación)
-    document.addEventListener('click', (e) => {
-      if (e.target.matches('#logoutBtnAlumno, #logoutBtnProfesor, #logoutBtnHome')) {
-        e.preventDefault();
-        this.logout();
-      }
+    // Logout button (navbar)
+    delegate(document, 'click', '#logoutBtn', (e) => {
+      e.preventDefault();
+      this.logout();
+    });
+
+    // Logout desde paneles (legacy support)
+    delegate(document, 'click', '#logoutBtnAlumno, #logoutBtnProfesor, #logoutBtnAdmin', (e) => {
+      e.preventDefault();
+      this.logout();
     });
   }
 
   /**
    * Maneja el proceso de login
-   * @param {Event} e - Evento submit
    * @private
    */
-  #handleLogin(e) {
-    e.preventDefault();
-
+  #handleLogin() {
     const email = getValue('#loginEmailHome');
     const password = getValue('#loginPasswordHome');
 
-    // Validación básica
-    if (!this.#validateLoginFields(email, password)) {
+    // Validación
+    const validation = validateLoginForm({ email, password });
+    
+    if (!validation.isValid) {
+      const firstError = Object.values(validation.errors)[0][0];
+      showAlert('formLoginHome', firstError);
       return;
     }
 
@@ -79,27 +86,6 @@ class AuthModule {
     } else {
       showAlert('formLoginHome', 'Usuario o contraseña incorrectos.');
     }
-  }
-
-  /**
-   * Valida los campos del login
-   * @param {string} email - Email
-   * @param {string} password - Contraseña
-   * @returns {boolean}
-   * @private
-   */
-  #validateLoginFields(email, password) {
-    if (!isNotEmpty(email) || !isNotEmpty(password)) {
-      showAlert('formLoginHome', 'Por favor completa todos los campos.');
-      return false;
-    }
-
-    if (!isValidEmail(email)) {
-      showAlert('formLoginHome', 'Por favor ingresa un email válido.');
-      return false;
-    }
-
-    return true;
   }
 
   /**
@@ -132,28 +118,24 @@ class AuthModule {
    */
   #loginSuccess(user) {
     appState.setUser(user);
-    resetForm(DOM_SELECTORS.LOGIN_FORM);
+    console.log(`[AuthModule] Login exitoso: ${user.name} (${user.role})`);
   }
 
   /**
    * Maneja el proceso de registro
-   * @param {Event} e - Evento submit
    * @private
    */
-  #handleRegister(e) {
-    e.preventDefault();
-
+  #handleRegister() {
     const email = getValue('#registerEmailHome');
     const password = getValue('#registerPasswordHome');
     const userType = getValue('#registerTipoHome');
 
-    // Validaciones
-    if (!userType) {
-      showAlert('formRegisterHome', 'Selecciona el tipo de usuario.');
-      return;
-    }
-
-    if (!this.#validateRegistrationFields(email, password)) {
+    // Validación
+    const validation = validateRegisterForm({ email, password, userType });
+    
+    if (!validation.isValid) {
+      const firstError = Object.values(validation.errors)[0][0];
+      showAlert('formRegisterHome', firstError);
       return;
     }
 
@@ -176,32 +158,6 @@ class AuthModule {
   }
 
   /**
-   * Valida campos de registro
-   * @param {string} email - Email
-   * @param {string} password - Contraseña
-   * @returns {boolean}
-   * @private
-   */
-  #validateRegistrationFields(email, password) {
-    if (!isNotEmpty(email) || !isNotEmpty(password)) {
-      showAlert('formRegisterHome', 'Por favor completa todos los campos.');
-      return false;
-    }
-
-    if (!isValidEmail(email)) {
-      showAlert('formRegisterHome', 'Por favor ingresa un email válido.');
-      return false;
-    }
-
-    if (password.length < 4) {
-      showAlert('formRegisterHome', 'La contraseña debe tener al menos 4 caracteres.');
-      return false;
-    }
-
-    return true;
-  }
-
-  /**
    * Verifica si un email ya está registrado
    * @param {string} email - Email a verificar
    * @returns {boolean}
@@ -219,6 +175,8 @@ class AuthModule {
    */
   logout() {
     appState.clearUser();
+    router.refresh();
+    console.log('[AuthModule] Sesión cerrada');
   }
 
   /**

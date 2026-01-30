@@ -1,142 +1,241 @@
 /**
- * @fileoverview Router - Controlador de vistas y navegación interna
+ * @fileoverview Router - Sistema de enrutamiento SPA con rutas protegidas
  * @module core/router
  */
 
-import { VIEWS, DOM_SELECTORS } from './config.js';
+import { VIEWS, USER_ROLES } from './config.js';
 import { appState } from './state.js';
-import { $, $$, show, hide, scrollToElement } from '../utils/dom.js';
+import { $ } from '../utils/dom.js';
+
+// Importar componentes
+import { Navbar } from '../components/Navbar.js';
+import { Home } from '../components/Home.js';
+import { StudentPanel } from '../components/StudentPanel.js';
+import { TeacherPanel } from '../components/TeacherPanel.js';
+import { AdminPanel } from '../components/AdminPanel.js';
+import { Modals } from '../components/Modals.js';
 
 /**
- * Clase Router - Gestiona la navegación entre vistas
+ * Configuración de rutas con protección por rol
+ * @constant {Object}
+ */
+const ROUTE_CONFIG = Object.freeze({
+  [VIEWS.HOME]: {
+    component: Home,
+    protected: false,
+    allowedRoles: null,
+    title: 'Inicio - Escuela DUX'
+  },
+  [VIEWS.STUDENT_DASHBOARD]: {
+    component: StudentPanel,
+    protected: true,
+    allowedRoles: [USER_ROLES.ALUMNO],
+    title: 'Panel del Alumno - Escuela DUX'
+  },
+  [VIEWS.TEACHER_DASHBOARD]: {
+    component: TeacherPanel,
+    protected: true,
+    allowedRoles: [USER_ROLES.PROFESOR],
+    title: 'Panel del Profesor - Escuela DUX'
+  },
+  [VIEWS.ADMIN_DASHBOARD]: {
+    component: AdminPanel,
+    protected: true,
+    allowedRoles: [USER_ROLES.ADMIN],
+    title: 'Panel Administrativo - Escuela DUX'
+  }
+});
+
+/**
+ * Clase Router - Sistema de enrutamiento SPA
  * @class
  */
 class Router {
-  #routes;
+  #container;
+  #navbarContainer;
+  #modalsContainer;
   #initialized;
+  #currentView;
 
   constructor() {
-    this.#routes = new Map();
+    this.#container = null;
+    this.#navbarContainer = null;
+    this.#modalsContainer = null;
     this.#initialized = false;
-    this.#registerDefaultRoutes();
+    this.#currentView = null;
   }
 
   /**
-   * Registra las rutas predeterminadas
-   * @private
-   */
-  #registerDefaultRoutes() {
-    this.register(VIEWS.HOME, () => this.#showHome());
-    this.register(VIEWS.STUDENT_DASHBOARD, () => this.#showStudentDashboard());
-    this.register(VIEWS.TEACHER_DASHBOARD, () => this.#showTeacherDashboard());
-    this.register(VIEWS.ADMIN_DASHBOARD, () => this.#showAdminDashboard());
-  }
-
-  /**
-   * Inicializa el router y suscribe al estado
+   * Inicializa el router
    */
   init() {
     if (this.#initialized) return;
 
+    // Obtener contenedores del DOM
+    this.#navbarContainer = $('#navbar-container');
+    this.#container = $('#app-container');
+    this.#modalsContainer = $('#modals-container');
+
+    if (!this.#container) {
+      console.error('[Router] No se encontró #app-container');
+      return;
+    }
+
+    // Renderizar navbar y modales
+    this.#renderNavbar();
+    this.#renderModals();
+
+    // Suscribirse a cambios de estado
     appState.subscribe('router', (state, prevState) => {
+      // Si cambia la vista, navegar
       if (state.currentView !== prevState.currentView) {
-        this.navigate(state.currentView);
+        this.#handleRouteChange(state.currentView);
+      }
+      
+      // Si cambia el estado de autenticación, actualizar navbar
+      if (state.isAuthenticated !== prevState.isAuthenticated) {
+        this.#renderNavbar();
       }
     });
 
     this.#initialized = true;
-    this.navigate(appState.getCurrentView());
+
+    // Navegar a la vista inicial
+    this.#handleRouteChange(appState.getCurrentView());
+    
+    console.log('[Router] Inicializado correctamente');
   }
 
   /**
-   * Registra una nueva ruta
+   * Maneja el cambio de ruta
    * @param {string} viewName - Nombre de la vista
-   * @param {Function} handler - Función manejadora
+   * @private
    */
-  register(viewName, handler) {
-    this.#routes.set(viewName, handler);
+  #handleRouteChange(viewName) {
+    const routeConfig = ROUTE_CONFIG[viewName];
+
+    if (!routeConfig) {
+      console.warn(`[Router] Vista no encontrada: ${viewName}, redirigiendo a home`);
+      this.navigate(VIEWS.HOME);
+      return;
+    }
+
+    // Verificar protección de ruta
+    if (routeConfig.protected && !this.#checkAccess(routeConfig)) {
+      console.warn(`[Router] Acceso denegado a: ${viewName}`);
+      this.navigate(VIEWS.HOME);
+      return;
+    }
+
+    // Actualizar título de la página
+    document.title = routeConfig.title;
+
+    // Renderizar componente
+    this.#render(routeConfig.component);
+    this.#currentView = viewName;
+
+    // Scroll al inicio
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /**
+   * Verifica si el usuario tiene acceso a la ruta
+   * @param {Object} routeConfig - Configuración de la ruta
+   * @returns {boolean}
+   * @private
+   */
+  #checkAccess(routeConfig) {
+    // Si la ruta no está protegida, permitir acceso
+    if (!routeConfig.protected) return true;
+
+    // Verificar autenticación
+    if (!appState.isLoggedIn()) {
+      console.log('[Router] Usuario no autenticado');
+      return false;
+    }
+
+    // Si no hay roles específicos, permitir a cualquier usuario autenticado
+    if (!routeConfig.allowedRoles) return true;
+
+    // Verificar rol del usuario
+    const userRole = appState.getUserRole();
+    const hasAccess = routeConfig.allowedRoles.includes(userRole);
+
+    if (!hasAccess) {
+      console.log(`[Router] Rol ${userRole} no autorizado para esta vista`);
+    }
+
+    return hasAccess;
+  }
+
+  /**
+   * Renderiza un componente en el contenedor principal
+   * @param {Function} component - Función componente
+   * @private
+   */
+  #render(component) {
+    if (this.#container && component) {
+      this.#container.innerHTML = component();
+    }
+  }
+
+  /**
+   * Renderiza el navbar
+   * @private
+   */
+  #renderNavbar() {
+    if (this.#navbarContainer) {
+      this.#navbarContainer.innerHTML = Navbar();
+    }
+  }
+
+  /**
+   * Renderiza los modales
+   * @private
+   */
+  #renderModals() {
+    if (this.#modalsContainer) {
+      this.#modalsContainer.innerHTML = Modals();
+    }
   }
 
   /**
    * Navega a una vista específica
-   * @param {string} viewName - Nombre de la vista destino
+   * @param {string} viewName - Nombre de la vista
    */
   navigate(viewName) {
-    const handler = this.#routes.get(viewName);
-    if (handler) {
-      this.#hideAllViews();
-      handler();
-    } else {
-      console.warn(`[Router] Vista no encontrada: ${viewName}`);
-      this.navigate(VIEWS.HOME);
+    if (viewName === this.#currentView) return;
+    appState.setView(viewName);
+  }
+
+  /**
+   * Obtiene la vista actual
+   * @returns {string}
+   */
+  getCurrentView() {
+    return this.#currentView;
+  }
+
+  /**
+   * Re-renderiza la vista actual
+   */
+  refresh() {
+    if (this.#currentView) {
+      const routeConfig = ROUTE_CONFIG[this.#currentView];
+      if (routeConfig) {
+        this.#render(routeConfig.component);
+      }
     }
+    this.#renderNavbar();
   }
 
   /**
-   * Oculta todas las vistas
-   * @private
+   * Registra una nueva ruta dinámicamente
+   * @param {string} viewName - Nombre de la vista
+   * @param {Object} config - Configuración de la ruta
    */
-  #hideAllViews() {
-    hide($(DOM_SELECTORS.HOME_SPLIT));
-    hide($(DOM_SELECTORS.STUDENT_PANEL));
-    hide($(DOM_SELECTORS.TEACHER_PANEL));
-    hide($(DOM_SELECTORS.ADMIN_SECTION));
-    hide($(DOM_SELECTORS.NAV_USER_HOME));
-  }
-
-  /**
-   * Muestra la vista Home
-   * @private
-   */
-  #showHome() {
-    show($(DOM_SELECTORS.HOME_SPLIT));
-    hide($(DOM_SELECTORS.NAV_USER_HOME));
-  }
-
-  /**
-   * Muestra el panel de alumno
-   * @private
-   */
-  #showStudentDashboard() {
-    const panel = $(DOM_SELECTORS.STUDENT_PANEL);
-    show(panel);
-    show($(DOM_SELECTORS.NAV_USER_HOME));
-    this.#updateUserTypeDisplay('Alumno');
-    scrollToElement(panel);
-  }
-
-  /**
-   * Muestra el panel de profesor
-   * @private
-   */
-  #showTeacherDashboard() {
-    const panel = $(DOM_SELECTORS.TEACHER_PANEL);
-    show(panel);
-    show($(DOM_SELECTORS.NAV_USER_HOME));
-    this.#updateUserTypeDisplay('Profesor');
-    scrollToElement(panel);
-  }
-
-  /**
-   * Muestra el panel de administrador
-   * @private
-   */
-  #showAdminDashboard() {
-    show($(DOM_SELECTORS.ADMIN_SECTION));
-    show($(DOM_SELECTORS.NAV_USER_HOME));
-    this.#updateUserTypeDisplay('Admin');
-  }
-
-  /**
-   * Actualiza el texto del tipo de usuario en la UI
-   * @param {string} userType - Tipo de usuario
-   * @private
-   */
-  #updateUserTypeDisplay(userType) {
-    const element = $(DOM_SELECTORS.USER_TYPE_HOME);
-    if (element) {
-      element.textContent = `Usuario: ${userType}`;
-    }
+  registerRoute(viewName, config) {
+    ROUTE_CONFIG[viewName] = config;
   }
 }
 

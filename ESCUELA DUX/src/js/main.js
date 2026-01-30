@@ -1,7 +1,7 @@
 /**
- * @fileoverview Main Entry Point - Punto de entrada principal de la aplicación
+ * @fileoverview Main Entry Point - Punto de entrada SPA
  * @module main
- * @description Inicializa todos los módulos y configura la aplicación EscuelaDUX
+ * @description Inicializa la aplicación EscuelaDUX como Single Page Application
  */
 
 // Core imports
@@ -13,10 +13,11 @@ import { VIEWS } from './core/config.js';
 import { authModule } from './modules/auth.js';
 import { studentModule } from './modules/student.js';
 import { teacherModule } from './modules/teacher.js';
+import { adminModule } from './modules/admin.js';
 import { enrollmentModule } from './modules/enrollment.js';
 
 /**
- * Clase principal de la aplicación
+ * Clase principal de la aplicación SPA
  * @class
  */
 class EscuelaDUXApp {
@@ -31,31 +32,32 @@ class EscuelaDUXApp {
   /**
    * Inicializa la aplicación
    */
-  init() {
+  async init() {
     if (this.#initialized) {
       console.warn('[EscuelaDUX] La aplicación ya fue inicializada');
       return;
     }
 
-    console.log('[EscuelaDUX] Inicializando aplicación...');
+    console.log('[EscuelaDUX] 🚀 Inicializando aplicación...');
 
     try {
       // Registrar módulos
       this.#registerModules();
       
-      // Inicializar módulos
-      this.#initializeModules();
-      
-      // Inicializar router
+      // Inicializar router (maneja renderizado)
       router.init();
       
-      // Suscribir a cambios de estado
+      // Inicializar módulos de lógica
+      this.#initializeModules();
+      
+      // Suscribir a cambios de estado para debugging
       this.#subscribeToStateChanges();
       
       this.#initialized = true;
-      console.log('[EscuelaDUX] Aplicación inicializada correctamente');
+      console.log('[EscuelaDUX] ✅ Aplicación inicializada correctamente');
+      
     } catch (error) {
-      console.error('[EscuelaDUX] Error al inicializar:', error);
+      console.error('[EscuelaDUX] ❌ Error al inicializar:', error);
     }
   }
 
@@ -67,6 +69,7 @@ class EscuelaDUXApp {
     this.#modules.set('auth', authModule);
     this.#modules.set('student', studentModule);
     this.#modules.set('teacher', teacherModule);
+    this.#modules.set('admin', adminModule);
     this.#modules.set('enrollment', enrollmentModule);
   }
 
@@ -78,7 +81,6 @@ class EscuelaDUXApp {
     this.#modules.forEach((module, name) => {
       try {
         module.init();
-        console.log(`[EscuelaDUX] Módulo '${name}' inicializado`);
       } catch (error) {
         console.error(`[EscuelaDUX] Error al inicializar módulo '${name}':`, error);
       }
@@ -94,15 +96,10 @@ class EscuelaDUXApp {
       // Log de cambios de autenticación
       if (state.isAuthenticated !== prevState.isAuthenticated) {
         if (state.isAuthenticated) {
-          console.log(`[EscuelaDUX] Usuario autenticado: ${state.user?.name} (${state.user?.role})`);
+          console.log(`[EscuelaDUX] 👤 Usuario: ${state.user?.name} (${state.user?.role})`);
         } else {
-          console.log('[EscuelaDUX] Sesión cerrada');
+          console.log('[EscuelaDUX] 🚪 Sesión cerrada');
         }
-      }
-
-      // Log de cambios de vista
-      if (state.currentView !== prevState.currentView) {
-        console.log(`[EscuelaDUX] Vista cambiada a: ${state.currentView}`);
       }
     });
   }
@@ -129,7 +126,7 @@ class EscuelaDUXApp {
    * @param {string} view - Vista destino
    */
   navigateTo(view) {
-    appState.setView(view);
+    router.navigate(view);
   }
 
   /**
@@ -139,24 +136,49 @@ class EscuelaDUXApp {
   isInitialized() {
     return this.#initialized;
   }
+
+  /**
+   * Refresca la vista actual
+   */
+  refresh() {
+    router.refresh();
+  }
 }
 
 // Crear instancia de la aplicación
 const app = new EscuelaDUXApp();
 
 // Inicializar cuando el DOM esté listo
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => app.init());
-} else {
+const initApp = () => {
   app.init();
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
 }
 
-// Exponer la aplicación globalmente para debugging (opcional)
-window.EscuelaDUX = {
+// Exponer API pública para debugging y extensibilidad
+window.EscuelaDUX = Object.freeze({
   app,
   state: appState,
   router,
-  VIEWS
-};
+  VIEWS,
+  
+  // Métodos de conveniencia
+  navigate: (view) => router.navigate(view),
+  refresh: () => router.refresh(),
+  getState: () => appState.getState(),
+  
+  // Para desarrollo/debugging
+  debug: () => {
+    console.group('🔍 EscuelaDUX Debug Info');
+    console.log('Estado:', appState.getState());
+    console.log('Vista actual:', router.getCurrentView());
+    console.log('Inicializado:', app.isInitialized());
+    console.groupEnd();
+  }
+});
 
 export default app;

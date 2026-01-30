@@ -96,6 +96,12 @@ export const TEST_USERS = Object.freeze({
     password: '1234',
     role: 'profesor',
     name: 'Profesor Demo'
+  },
+  admin: {
+    email: 'admin@dux.com',
+    password: '1234',
+    role: 'admin',
+    name: 'Administrador'
   }
 });
 
@@ -168,11 +174,10 @@ export const COMPANY_INFO = Object.freeze({
  * @constant {Object}
  */
 export const DOM_SELECTORS = Object.freeze({
-  // Contenedores principales
-  HOME_SPLIT: '.home-split',
-  STUDENT_PANEL: '#alumnoPanel',
-  TEACHER_PANEL: '#profesorPanel',
-  ADMIN_SECTION: '#adminSection',
+  // Contenedores principales (SPA)
+  NAVBAR_CONTAINER: '#navbar-container',
+  APP_CONTAINER: '#app-container',
+  MODALS_CONTAINER: '#modals-container',
   
   // Formularios
   LOGIN_FORM: '#formLoginHome',
@@ -186,14 +191,15 @@ export const DOM_SELECTORS = Object.freeze({
   // Contenido dinámico
   STUDENT_CONTENT: '#studentContent',
   TEACHER_CONTENT: '#profContent',
-  PLANILLA_PREVIEW: '#planillaPreview',
-  
-  // Navegación
-  NAV_USER_HOME: '#navUserHome',
-  USER_TYPE_HOME: '#userTypeHome',
-  
-  // Botones
-  LOGOUT_STUDENT: '#logoutBtnAlumno',
-  LOGOUT_TEACHER: '#logoutBtnProfesor',
-  INSCRIPTION_BTN: '#inscripcionBtn'
+  ADMIN_CONTENT: '#adminContent',
+  PLANILLA_PREVIEW: '#planillaPreview'
+});
+
+/**
+ * URLs de assets
+ * @constant {Object}
+ */
+export const ASSETS = Object.freeze({
+  LOGO: 'public/assets/images/logo-escuela-dux.png',
+  AVATAR_DEFAULT: 'public/assets/images/avatar-alumno.png'
 });

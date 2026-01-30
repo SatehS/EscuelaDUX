@@ -1,0 +1,422 @@
+/**
+ * Admin CSS - Estilos específicos del panel administrativo
+ */
+
+/* ============================================
+ * ADMIN LAYOUT
+ * ============================================ */
+
+.admin-layout {
+  display: flex;
+  min-height: 80vh;
+  background-color: var(--color-gray-100);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+/* ============================================
+ * ADMIN SIDEBAR
+ * ============================================ */
+
+.admin-sidebar {
+  width: 240px;
+  background: linear-gradient(180deg, var(--color-dark) 0%, #1a1f2e 100%);
+  color: var(--color-white);
+  min-height: 100%;
+  padding-bottom: var(--spacing-8);
+  border-right: 2px solid var(--color-primary-alpha-22);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.sidebar-logo-bg--admin {
+  background: linear-gradient(135deg, var(--color-primary) 0%, #ff6659 100%);
+  box-shadow: 0 4px 20px rgba(211, 47, 47, 0.3);
+}
+
+.sidebar-admin-badge {
+  padding: var(--spacing-2) var(--spacing-4);
+}
+
+.sidebar-admin-badge .badge {
+  font-size: var(--font-size-xs);
+  padding: var(--spacing-2) var(--spacing-3);
+  letter-spacing: var(--letter-spacing-wider);
+}
+
+/* ============================================
+ * ADMIN MAIN CONTENT
+ * ============================================ */
+
+.admin-main {
+  flex: 1;
+  background-color: var(--color-gray-100);
+  padding: 0;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-header {
+  background-color: var(--bg-card);
+  border-bottom: 1.5px solid var(--color-primary-alpha-22);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  min-height: 70px;
+  padding: var(--spacing-4);
+}
+
+.admin-header h5 {
+  font-weight: var(--font-weight-bold);
+}
+
+.admin-content {
+  padding: var(--spacing-6);
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ============================================
+ * STAT CARDS
+ * ============================================ */
+
+.admin-stat-card {
+  border-radius: var(--radius-md);
+  border: none;
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.admin-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.admin-stat-card .card-body {
+  padding: var(--spacing-5);
+}
+
+.admin-stat-card .card-subtitle {
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.admin-stat-card .card-title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.admin-stat-icon {
+  font-size: 2.5rem;
+  opacity: 0.8;
+}
+
+/* ============================================
+ * ADMIN TABLES
+ * ============================================ */
+
+.admin-content .table {
+  background-color: var(--bg-card);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.admin-content .table thead {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.admin-content .table thead th {
+  border: none;
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  font-size: var(--font-size-xs);
+  letter-spacing: var(--letter-spacing-wide);
+  padding: var(--spacing-4);
+}
+
+.admin-content .table tbody td {
+  padding: var(--spacing-4);
+  vertical-align: middle;
+  border-color: var(--color-gray-100);
+}
+
+.admin-content .table-hover tbody tr:hover {
+  background-color: var(--bg-hover);
+}
+
+/* ============================================
+ * ADMIN CARDS
+ * ============================================ */
+
+.admin-content .card {
+  border: none;
+  border-radius: var(--radius-md);
+}
+
+.admin-content .card-header {
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--color-gray-100);
+  padding: var(--spacing-4) var(--spacing-5);
+}
+
+.admin-content .card-header h5 {
+  margin: 0;
+  font-weight: var(--font-weight-semibold);
+}
+
+.admin-content .card-body {
+  padding: var(--spacing-5);
+}
+
+.admin-content .card-footer {
+  background-color: var(--color-gray-100);
+  border-top: none;
+  padding: var(--spacing-3) var(--spacing-4);
+}
+
+/* ============================================
+ * ADMIN FORMS
+ * ============================================ */
+
+.admin-content .form-label {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-700);
+  margin-bottom: var(--spacing-2);
+}
+
+.admin-content .form-control,
+.admin-content .form-select {
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--color-gray-300);
+  padding: var(--spacing-3);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.admin-content .form-control:focus,
+.admin-content .form-select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-alpha-15);
+}
+
+/* ============================================
+ * ADMIN QUICK ACTIONS
+ * ============================================ */
+
+.admin-content [data-action] {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.admin-content [data-action]:hover {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
+}
+
+/* ============================================
+ * ADMIN TABS
+ * ============================================ */
+
+.admin-content .nav-tabs {
+  border-bottom: 2px solid var(--color-gray-100);
+}
+
+.admin-content .nav-tabs .nav-link {
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--color-gray-500);
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-3) var(--spacing-4);
+  margin-bottom: -2px;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.admin-content .nav-tabs .nav-link:hover {
+  color: var(--color-primary);
+  border-color: transparent;
+}
+
+.admin-content .nav-tabs .nav-link.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  background: transparent;
+}
+
+/* ============================================
+ * ADMIN LIST GROUP
+ * ============================================ */
+
+.admin-content .list-group-item {
+  border: none;
+  border-bottom: 1px solid var(--color-gray-100);
+  padding: var(--spacing-4);
+  transition: background-color var(--transition-fast);
+}
+
+.admin-content .list-group-item:last-child {
+  border-bottom: none;
+}
+
+.admin-content .list-group-item:hover {
+  background-color: var(--color-gray-100);
+}
+
+/* ============================================
+ * COURSE CARDS (Admin)
+ * ============================================ */
+
+.admin-content .card h6.card-title {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-2);
+}
+
+.admin-content .card .card-text.small {
+  line-height: 1.6;
+}
+
+/* ============================================
+ * RESPONSIVE
+ * ============================================ */
+
+@media (max-width: 1199px) {
+  .admin-sidebar {
+    width: 200px;
+  }
+  
+  .admin-content {
+    padding: var(--spacing-4);
+  }
+}
+
+@media (max-width: 991px) {
+  .admin-layout {
+    flex-direction: column;
+  }
+
+  .admin-sidebar {
+    width: 100%;
+    flex-direction: row;
+    border-right: none;
+    border-bottom: 2px solid var(--color-primary-alpha-22);
+    min-height: auto;
+    padding-bottom: 0;
+    overflow-x: auto;
+  }
+
+  .admin-sidebar .sidebar-logo,
+  .admin-sidebar .sidebar-admin-badge {
+    display: none;
+  }
+
+  .admin-sidebar .sidebar-menu {
+    flex-direction: row;
+    display: flex;
+    width: 100%;
+    margin-top: 0;
+    padding: var(--spacing-2);
+    gap: var(--spacing-1);
+  }
+
+  .admin-sidebar .sidebar-menu .nav-link {
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--font-size-sm);
+    white-space: nowrap;
+  }
+
+  .admin-stat-card .card-title {
+    font-size: var(--font-size-2xl);
+  }
+
+  .admin-stat-icon {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .admin-content {
+    padding: var(--spacing-3);
+  }
+
+  .admin-header {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-3);
+  }
+
+  .admin-stat-card .card-body {
+    padding: var(--spacing-3);
+  }
+
+  .admin-content .table {
+    font-size: var(--font-size-sm);
+  }
+
+  .admin-content .table th,
+  .admin-content .table td {
+    padding: var(--spacing-2);
+  }
+}
+
+/* ============================================
+ * ADMIN ANIMATIONS
+ * ============================================ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.admin-content > * {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* ============================================
+ * ADMIN BADGES CUSTOM
+ * ============================================ */
+
+.admin-content .badge {
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-1) var(--spacing-2);
+}
+
+/* ============================================
+ * ADMIN BUTTONS
+ * ============================================ */
+
+.admin-content .btn-sm {
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: var(--font-size-sm);
+  border-radius: var(--radius-sm);
+}
+
+.admin-content .btn-outline-primary {
+  color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.admin-content .btn-outline-primary:hover {
+  background-color: #0d6efd;
+  color: var(--color-white);
+}
+
+.admin-content .btn-outline-secondary {
+  color: var(--color-gray-500);
+  border-color: var(--color-gray-300);
+}
+
+.admin-content .btn-outline-secondary:hover {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-700);
+}
