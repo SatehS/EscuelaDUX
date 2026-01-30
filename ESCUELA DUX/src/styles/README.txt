@@ -1,0 +1,1 @@
+Coloca aquí cualquier fuente, explicación o guía de estilos para el equipo.

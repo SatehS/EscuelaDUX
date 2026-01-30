@@ -1,0 +1,24 @@
+/* layout.css: Estructura general, grids, contenedores */
+.container-fluid, .container {
+  width: 100%;
+  margin: 0 auto;
+}
+.min-vh-100 {
+  min-height: 100vh;
+}
+.d-flex {
+  display: flex;
+}
+.justify-content-center {
+  justify-content: center;
+}
+.align-items-center {
+  align-items: center;
+}
+.row {
+  display: flex;
+  flex-wrap: wrap;
+}
+.col-md-6, .col-12, .col-10, .col-2, .col-3, .col-4, .col-6 {
+  /* Placeholder para columnas, usar clases de Bootstrap o personalizadas */
+}

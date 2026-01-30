@@ -1,0 +1,1 @@
+Coloca aquí el punto de entrada (app.js) y otros archivos JS principales.
