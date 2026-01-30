@@ -1,0 +1,401 @@
+/**
+ * Components CSS - Estilos de componentes reutilizables
+ * Metodología: BEM (Block Element Modifier)
+ */
+
+/* ============================================
+ * BOTONES
+ * ============================================ */
+
+/* Botón base */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  padding: var(--btn-padding-y) var(--btn-padding-x);
+  font-weight: var(--font-weight-semibold);
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  border: none;
+  border-radius: var(--btn-radius);
+  transition: all var(--transition-base);
+}
+
+/* Botón primario (danger/rojo) */
+.btn-danger {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border-radius: var(--btn-radius-pill);
+  box-shadow: var(--shadow-primary-sm);
+}
+
+.btn-danger:hover,
+.btn-danger:focus {
+  background-color: var(--color-primary-dark);
+  box-shadow: var(--shadow-primary-lg);
+}
+
+/* Botón outline */
+.btn-outline-danger {
+  background-color: transparent;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--btn-radius-pill);
+}
+
+.btn-outline-danger:hover,
+.btn-outline-danger:focus {
+  background-color: var(--bg-hover);
+  color: var(--color-primary-dark);
+}
+
+/* Botón light */
+.btn-light {
+  color: var(--color-primary);
+  background-color: var(--color-white);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--btn-radius-pill);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-light:hover,
+.btn-light:focus {
+  background-color: var(--bg-hover);
+  color: var(--color-primary-dark);
+  box-shadow: var(--shadow-primary-md);
+}
+
+/* Tamaños de botón */
+.btn-lg {
+  font-size: var(--font-size-lg);
+  padding: var(--btn-padding-y) 0;
+  border-radius: var(--radius-2xl);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.btn-sm {
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: var(--font-size-sm);
+}
+
+/* ============================================
+ * FORMULARIOS
+ * ============================================ */
+
+/* Input grande */
+.form-control-lg {
+  padding: var(--input-padding-y) var(--input-padding-x);
+  font-size: var(--font-size-lg);
+  border-radius: var(--input-radius);
+  border: 1.5px solid var(--input-border-color);
+  background-color: var(--bg-input);
+  transition: border var(--transition-base), box-shadow var(--transition-base);
+}
+
+.form-control-lg:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-alpha-22);
+  outline: none;
+}
+
+/* ============================================
+ * CARDS
+ * ============================================ */
+
+.card {
+  background-color: var(--bg-card);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+}
+
+.card--shadow-lg {
+  box-shadow: var(--shadow-lg);
+}
+
+.card--shadow-xl {
+  box-shadow: var(--shadow-xl);
+}
+
+/* ============================================
+ * MODALS
+ * ============================================ */
+
+.modal-content {
+  border-radius: var(--radius-md);
+  border: none;
+  overflow: hidden;
+}
+
+.modal-header {
+  border-bottom: var(--border-width-2) solid var(--color-primary);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.modal-header.bg-danger {
+  background-color: var(--color-primary) !important;
+}
+
+/* ============================================
+ * ALERTAS
+ * ============================================ */
+
+.alert {
+  padding: var(--spacing-3) var(--spacing-4);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--spacing-4);
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  color: #721c24;
+}
+
+.alert-success {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+}
+
+.alert-info {
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
+  color: #0c5460;
+}
+
+.alert-warning {
+  background-color: #fff3cd;
+  border-color: #ffeeba;
+  color: #856404;
+}
+
+/* ============================================
+ * BADGES
+ * ============================================ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-sm);
+}
+
+.badge.bg-success {
+  background-color: var(--color-success) !important;
+}
+
+.badge.bg-warning {
+  background-color: var(--color-warning) !important;
+}
+
+.badge.bg-danger {
+  background-color: var(--color-primary) !important;
+}
+
+/* ============================================
+ * NAV PILLS
+ * ============================================ */
+
+.nav-pills .nav-link {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-2xl);
+  margin: 0 var(--spacing-1);
+  transition: all var(--transition-base);
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.nav-pills .nav-link:hover:not(.active) {
+  background-color: var(--bg-hover);
+}
+
+/* ============================================
+ * LIST GROUP
+ * ============================================ */
+
+.list-group-item {
+  border: 1px solid var(--color-primary);
+  margin-bottom: var(--spacing-2);
+  border-radius: var(--radius-md);
+  transition: box-shadow var(--transition-base);
+}
+
+.list-group-item:hover {
+  box-shadow: var(--shadow-primary-sm);
+}
+
+/* ============================================
+ * PROGRESS BAR
+ * ============================================ */
+
+.progress {
+  height: 20px;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-gray-100);
+  overflow: hidden;
+}
+
+.progress-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-white);
+  transition: width var(--transition-slow);
+}
+
+.progress-bar.bg-danger {
+  background-color: var(--color-primary) !important;
+}
+
+/* ============================================
+ * TABLAS
+ * ============================================ */
+
+.table {
+  width: 100%;
+  margin-bottom: var(--spacing-4);
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: var(--spacing-3);
+  vertical-align: middle;
+  border-bottom: 1px solid var(--color-gray-300);
+}
+
+.table-danger th,
+.table-danger td {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: var(--color-gray-100);
+}
+
+.table-hover tbody tr:hover {
+  background-color: var(--bg-hover);
+}
+
+/* ============================================
+ * CLASES DE VIDEO
+ * ============================================ */
+
+.clases-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-6);
+}
+
+.clase-card {
+  width: 320px;
+  background-color: var(--bg-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  margin-bottom: var(--spacing-4);
+}
+
+.clase-card iframe {
+  width: 100%;
+  height: 180px;
+  border: none;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.clase-card .clase-title {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  padding: var(--spacing-3) var(--spacing-4) var(--spacing-4);
+  font-size: var(--font-size-lg);
+}
+
+/* ============================================
+ * ÁREA DE UPLOAD
+ * ============================================ */
+
+.tarea-upload-area {
+  background-color: var(--bg-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--card-shadow);
+  padding: var(--spacing-8) var(--spacing-6);
+  max-width: 420px;
+}
+
+.tarea-upload-area label {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary);
+  display: block;
+  margin-bottom: var(--spacing-2);
+}
+
+.tarea-upload-area .form-control[type="file"] {
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--input-border-color);
+}
+
+.tarea-upload-area .btn {
+  border-radius: var(--btn-radius-pill);
+  font-weight: var(--font-weight-semibold);
+}
+
+.tarea-upload-area .tarea-file-name {
+  margin-top: var(--spacing-4);
+  color: var(--color-dark);
+  font-size: var(--font-size-base);
+}
+
+/* ============================================
+ * AVATAR
+ * ============================================ */
+
+.student-avatar-img {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  border: 2px solid var(--color-primary);
+  box-shadow: var(--shadow-primary-md);
+}
+
+/* ============================================
+ * PLANILLA
+ * ============================================ */
+
+.planilla__logo {
+  max-width: 90px;
+}
+
+.planilla__section {
+  margin-bottom: var(--spacing-4);
+}
+
+.planilla__section--legal {
+  font-size: var(--font-size-sm);
+}
+
+.planilla__signatures {
+  margin-top: var(--spacing-8);
+}
+
+.planilla__signature-line {
+  border-top: 1px solid var(--color-gray-500);
+  width: 150px;
+  margin: 0 auto;
+}

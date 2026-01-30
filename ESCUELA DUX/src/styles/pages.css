@@ -1,0 +1,257 @@
+/**
+ * Pages CSS - Estilos específicos de páginas y vistas
+ */
+
+/* ============================================
+ * HERO SECTION (si se usa en el futuro)
+ * ============================================ */
+
+.hero-section {
+  background: none;
+  min-height: 60vh;
+  color: var(--color-white);
+  padding-top: 60px;
+  padding-bottom: 60px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=1200&q=80');
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+  filter: brightness(0.7) blur(1px);
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 1;
+}
+
+.hero-content {
+  z-index: 2;
+  position: relative;
+}
+
+.hero-section h1 {
+  font-family: var(--font-family-heading);
+  font-weight: var(--font-weight-extrabold);
+  letter-spacing: var(--letter-spacing-wide);
+  color: var(--color-white);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+.hero-section .lead {
+  color: var(--text-light);
+  font-size: var(--font-size-xl);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+/* ============================================
+ * LOGIN MODAL (estilo especial)
+ * ============================================ */
+
+.login-modal-content {
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-2xl);
+  border: none;
+}
+
+.login-modal-left {
+  background: linear-gradient(135deg, var(--color-black) 0%, var(--color-primary) 100%);
+  min-height: 420px;
+  position: relative;
+}
+
+.login-modal-left::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml;utf8,<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg"><circle cx="200" cy="200" r="180" fill="none" stroke="white" stroke-width="8" opacity="0.08"/><circle cx="100" cy="100" r="60" fill="none" stroke="white" stroke-width="4" opacity="0.10"/><circle cx="300" cy="300" r="40" fill="none" stroke="white" stroke-width="3" opacity="0.10"/></svg>');
+  background-size: cover;
+  opacity: 0.5;
+  z-index: 0;
+}
+
+.login-modal-left > * {
+  z-index: 1;
+  position: relative;
+}
+
+.login-modal-left h2 {
+  color: var(--color-white);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.login-modal-left p {
+  color: var(--text-light);
+  font-size: var(--font-size-lg);
+}
+
+.login-modal-left .logo-hero {
+  background: transparent;
+  box-shadow: none;
+  width: 120px;
+  margin-bottom: var(--spacing-4);
+}
+
+.login-modal-content .bg-white {
+  border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
+}
+
+/* ============================================
+ * ADMIN PANEL
+ * ============================================ */
+
+#adminSection h2 {
+  margin-bottom: var(--spacing-6);
+}
+
+#adminSection .list-group-item {
+  font-size: var(--font-size-lg);
+  padding: var(--spacing-4);
+}
+
+/* ============================================
+ * ENROLLMENT / PLANILLA
+ * ============================================ */
+
+#planillaPreview {
+  background-color: var(--color-white);
+  padding: var(--spacing-6);
+}
+
+#planillaPreview .container-fluid {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Secciones de la planilla */
+#planillaPreview .bg-danger {
+  background-color: var(--color-primary) !important;
+}
+
+/* ============================================
+ * DETALLES DEL CURSO (Modal inscripción)
+ * ============================================ */
+
+#detallesCurso .card {
+  border: 1px solid var(--color-primary);
+  background-color: var(--color-gray-100);
+}
+
+#detallesCurso p {
+  margin-bottom: var(--spacing-2);
+}
+
+/* ============================================
+ * DASHBOARD WELCOME CARDS
+ * ============================================ */
+
+.student-content > .card:first-child,
+.prof-content > .card:first-child {
+  border-left: 4px solid var(--color-primary);
+}
+
+/* ============================================
+ * EMPTY STATES
+ * ============================================ */
+
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-16) var(--spacing-8);
+  color: var(--text-secondary);
+}
+
+.empty-state__icon {
+  font-size: 4rem;
+  margin-bottom: var(--spacing-4);
+  opacity: 0.5;
+}
+
+.empty-state__title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--spacing-2);
+  color: var(--text-primary);
+}
+
+.empty-state__description {
+  font-size: var(--font-size-base);
+  margin-bottom: var(--spacing-6);
+}
+
+/* ============================================
+ * LOADING STATES
+ * ============================================ */
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-8);
+}
+
+.loading__spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--color-gray-300);
+  border-top-color: var(--color-primary);
+  border-radius: var(--radius-full);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================
+ * RESPONSIVE ESPECÍFICO DE PÁGINAS
+ * ============================================ */
+
+@media (max-width: 767px) {
+  .login-modal-content {
+    border-radius: var(--radius-lg);
+  }
+
+  .login-modal-left,
+  .login-modal-content .bg-white {
+    border-radius: 0 !important;
+  }
+
+  .login-modal-left {
+    min-height: 180px;
+    padding: var(--spacing-8) var(--spacing-4) !important;
+  }
+
+  .login-modal-content .bg-white {
+    padding: var(--spacing-8) var(--spacing-4) !important;
+  }
+
+  #planillaPreview {
+    padding: var(--spacing-3);
+    font-size: var(--font-size-sm);
+  }
+
+  #planillaPreview .row > div {
+    margin-bottom: var(--spacing-2);
+  }
+}
