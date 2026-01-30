@@ -1,9 +1,10 @@
 /**
- * @fileoverview State Manager - Gestión centralizada del estado de la aplicación
+ * @fileoverview State Manager - Gestión centralizada del estado (sin localStorage)
  * @module core/state
  */
 
 import { USER_ROLES, VIEWS } from './config.js';
+import { api } from '../services/api.js';
 
 /**
  * Estado inicial de la aplicación
@@ -13,11 +14,13 @@ const INITIAL_STATE = Object.freeze({
   user: null,
   isAuthenticated: false,
   currentView: VIEWS.HOME,
-  currentSection: null
+  currentSection: null,
+  isLoading: false,
+  dashboardData: null
 });
 
 /**
- * Clase StateManager - Implementa el patrón Observer para gestión de estado
+ * Clase StateManager - Implementa el patrón Observer con sesión en memoria
  * @class
  */
 class StateManager {
@@ -27,6 +30,20 @@ class StateManager {
   constructor() {
     this.#state = { ...INITIAL_STATE };
     this.#listeners = new Map();
+    this.#restoreSession();
+  }
+
+  /**
+   * Restaura la sesión desde sessionStorage
+   * @private
+   */
+  #restoreSession() {
+    const session = api.getSession();
+    if (session && session.user) {
+      this.#state.user = session.user;
+      this.#state.isAuthenticated = true;
+      this.#state.currentView = this.#getViewForRole(session.user.role.name);
+    }
   }
 
   /**
@@ -84,22 +101,35 @@ class StateManager {
   reset() {
     const prevState = { ...this.#state };
     this.#state = { ...INITIAL_STATE };
+    api.logout();
     this.#notifyListeners(prevState);
   }
 
   // ============================================
-  // Métodos específicos de autenticación
+  // Métodos de autenticación
   // ============================================
 
   /**
-   * Establece el usuario autenticado
-   * @param {Object} user - Datos del usuario
+   * Establece el usuario autenticado desde respuesta de API
+   * @param {Object} userData - Datos del usuario de la API
    */
-  setUser(user) {
+  setUser(userData) {
+    // Normalizar estructura del usuario
+    const user = {
+      id: userData.id,
+      name: userData.full_name,
+      email: userData.email,
+      role: userData.role.name,
+      roleId: userData.role.id,
+      phone: userData.phone || null,
+      avatarUrl: userData.avatar_url || null
+    };
+
     this.setState({
       user,
       isAuthenticated: true,
-      currentView: this.#getViewForRole(user.role)
+      currentView: this.#getViewForRole(user.role),
+      dashboardData: null // Resetear datos del dashboard
     });
   }
 
@@ -127,11 +157,27 @@ class StateManager {
   }
 
   /**
+   * Obtiene el ID del usuario actual
+   * @returns {number|null}
+   */
+  getUserId() {
+    return this.#state.user?.id || null;
+  }
+
+  /**
    * Obtiene el nombre del usuario actual
    * @returns {string|null}
    */
   getUserName() {
     return this.#state.user?.name || null;
+  }
+
+  /**
+   * Obtiene el usuario completo
+   * @returns {Object|null}
+   */
+  getUser() {
+    return this.#state.user;
   }
 
   /**
@@ -144,7 +190,10 @@ class StateManager {
     const viewMap = {
       [USER_ROLES.ALUMNO]: VIEWS.STUDENT_DASHBOARD,
       [USER_ROLES.PROFESOR]: VIEWS.TEACHER_DASHBOARD,
-      [USER_ROLES.ADMIN]: VIEWS.ADMIN_DASHBOARD
+      [USER_ROLES.ADMIN]: VIEWS.ADMIN_DASHBOARD,
+      'student': VIEWS.STUDENT_DASHBOARD,
+      'teacher': VIEWS.TEACHER_DASHBOARD,
+      'admin': VIEWS.ADMIN_DASHBOARD
     };
     return viewMap[role] || VIEWS.HOME;
   }
@@ -158,7 +207,7 @@ class StateManager {
    * @param {string} view - Nueva vista
    */
   setView(view) {
-    this.setState({ currentView: view, currentSection: null });
+    this.setState({ currentView: view, currentSection: null, dashboardData: null });
   }
 
   /**
@@ -183,6 +232,42 @@ class StateManager {
    */
   getCurrentSection() {
     return this.#state.currentSection;
+  }
+
+  // ============================================
+  // Métodos de carga de datos
+  // ============================================
+
+  /**
+   * Establece el estado de carga
+   * @param {boolean} isLoading
+   */
+  setLoading(isLoading) {
+    this.setState({ isLoading });
+  }
+
+  /**
+   * Verifica si está cargando
+   * @returns {boolean}
+   */
+  isLoading() {
+    return this.#state.isLoading;
+  }
+
+  /**
+   * Guarda los datos del dashboard
+   * @param {Object} data
+   */
+  setDashboardData(data) {
+    this.setState({ dashboardData: data });
+  }
+
+  /**
+   * Obtiene los datos del dashboard
+   * @returns {Object|null}
+   */
+  getDashboardData() {
+    return this.#state.dashboardData;
   }
 }
 

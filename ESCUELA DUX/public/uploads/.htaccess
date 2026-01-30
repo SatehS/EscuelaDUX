@@ -1,0 +1,21 @@
+# Proteger directorio de uploads
+# Prevenir ejecución de PHP en archivos subidos
+
+<FilesMatch "\.(php|php5|phtml|phar)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Solo permitir tipos de archivo seguros
+<FilesMatch "\.(jpg|jpeg|png|gif|pdf|doc|docx|txt)$">
+    Order allow,deny
+    Allow from all
+</FilesMatch>
+
+# Deshabilitar listado de directorio
+Options -Indexes
+
+# Headers de seguridad
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+</IfModule>

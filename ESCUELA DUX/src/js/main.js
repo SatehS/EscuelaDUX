@@ -1,13 +1,16 @@
 /**
- * @fileoverview Main Entry Point - Punto de entrada SPA
+ * @fileoverview Main Entry Point - Punto de entrada SPA con API
  * @module main
- * @description Inicializa la aplicación EscuelaDUX como Single Page Application
+ * @description Inicializa la aplicación EscuelaDUX con backend PHP
  */
 
 // Core imports
 import { appState } from './core/state.js';
 import { router } from './core/router.js';
 import { VIEWS } from './core/config.js';
+
+// Services
+import { api } from './services/api.js';
 
 // Module imports
 import { authModule } from './modules/auth.js';
@@ -17,7 +20,7 @@ import { adminModule } from './modules/admin.js';
 import { enrollmentModule } from './modules/enrollment.js';
 
 /**
- * Clase principal de la aplicación SPA
+ * Clase principal de la aplicación SPA con backend
  * @class
  */
 class EscuelaDUXApp {
@@ -50,8 +53,11 @@ class EscuelaDUXApp {
       // Inicializar módulos de lógica
       this.#initializeModules();
       
-      // Suscribir a cambios de estado para debugging
+      // Suscribir a cambios de estado
       this.#subscribeToStateChanges();
+      
+      // Cargar datos iniciales si hay sesión
+      await this.#loadInitialData();
       
       this.#initialized = true;
       console.log('[EscuelaDUX] ✅ Aplicación inicializada correctamente');
@@ -92,16 +98,59 @@ class EscuelaDUXApp {
    * @private
    */
   #subscribeToStateChanges() {
-    appState.subscribe('main', (state, prevState) => {
+    appState.subscribe('main', async (state, prevState) => {
       // Log de cambios de autenticación
       if (state.isAuthenticated !== prevState.isAuthenticated) {
         if (state.isAuthenticated) {
           console.log(`[EscuelaDUX] 👤 Usuario: ${state.user?.name} (${state.user?.role})`);
+          // Cargar datos del dashboard según el rol
+          await this.#loadDashboardData(state.user?.role);
         } else {
           console.log('[EscuelaDUX] 🚪 Sesión cerrada');
         }
       }
+
+      // Si cambia la vista, cargar datos correspondientes
+      if (state.currentView !== prevState.currentView && state.isAuthenticated) {
+        await this.#loadDashboardData(state.user?.role);
+      }
     });
+  }
+
+  /**
+   * Carga datos iniciales si hay sesión activa
+   * @private
+   */
+  async #loadInitialData() {
+    if (appState.isLoggedIn()) {
+      const role = appState.getUserRole();
+      await this.#loadDashboardData(role);
+    }
+  }
+
+  /**
+   * Carga datos del dashboard según el rol
+   * @param {string} role - Rol del usuario
+   * @private
+   */
+  async #loadDashboardData(role) {
+    try {
+      switch (role) {
+        case 'student':
+        case 'alumno':
+          await studentModule.loadDashboardData();
+          break;
+        case 'teacher':
+        case 'profesor':
+          await teacherModule.loadDashboardData();
+          break;
+        case 'admin':
+          await adminModule.loadStats();
+          break;
+      }
+    } catch (error) {
+      console.error('[EscuelaDUX] Error cargando datos:', error);
+    }
   }
 
   /**
@@ -164,6 +213,7 @@ window.EscuelaDUX = Object.freeze({
   app,
   state: appState,
   router,
+  api,
   VIEWS,
   
   // Métodos de conveniencia
@@ -176,6 +226,7 @@ window.EscuelaDUX = Object.freeze({
     console.group('🔍 EscuelaDUX Debug Info');
     console.log('Estado:', appState.getState());
     console.log('Vista actual:', router.getCurrentView());
+    console.log('Sesión API:', api.getSession());
     console.log('Inicializado:', app.isInitialized());
     console.groupEnd();
   }

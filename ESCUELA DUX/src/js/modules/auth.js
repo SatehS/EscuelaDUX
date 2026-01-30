@@ -1,16 +1,17 @@
 /**
- * @fileoverview Módulo de Autenticación - Login, Logout y gestión de sesión
+ * @fileoverview Módulo de Autenticación - Login, Logout con API
  * @module modules/auth
  */
 
-import { TEST_USERS, USER_ROLES, DOM_SELECTORS } from '../core/config.js';
+import { USER_ROLES } from '../core/config.js';
 import { appState } from '../core/state.js';
 import { router } from '../core/router.js';
-import { $, getValue, showAlert, removeAlert, resetForm, delegate } from '../utils/dom.js';
+import { api, ApiError } from '../services/api.js';
+import { $, getValue, showAlert, removeAlert, resetForm, delegate, setHTML } from '../utils/dom.js';
 import { validateLoginForm, validateRegisterForm } from '../utils/validators.js';
 
 /**
- * Clase AuthModule - Gestiona la autenticación de usuarios
+ * Clase AuthModule - Gestiona la autenticación con el backend
  * @class
  */
 class AuthModule {
@@ -35,7 +36,7 @@ class AuthModule {
    * @private
    */
   #bindEvents() {
-    // Login Form (delegación desde document para SPA)
+    // Login Form
     delegate(document, 'submit', '#formLoginHome', (e) => {
       e.preventDefault();
       this.#handleLogin();
@@ -47,14 +48,8 @@ class AuthModule {
       this.#handleRegister();
     });
 
-    // Logout button (navbar)
+    // Logout button
     delegate(document, 'click', '#logoutBtn', (e) => {
-      e.preventDefault();
-      this.logout();
-    });
-
-    // Logout desde paneles (legacy support)
-    delegate(document, 'click', '#logoutBtnAlumno, #logoutBtnProfesor, #logoutBtnAdmin', (e) => {
       e.preventDefault();
       this.logout();
     });
@@ -64,11 +59,11 @@ class AuthModule {
    * Maneja el proceso de login
    * @private
    */
-  #handleLogin() {
+  async #handleLogin() {
     const email = getValue('#loginEmailHome');
     const password = getValue('#loginPasswordHome');
 
-    // Validación
+    // Validación local
     const validation = validateLoginForm({ email, password });
     
     if (!validation.isValid) {
@@ -77,60 +72,54 @@ class AuthModule {
       return;
     }
 
-    // Autenticar usuario
-    const user = this.#authenticateUser(email, password);
-    
-    if (user) {
-      removeAlert('formLoginHome');
-      this.#loginSuccess(user);
-    } else {
-      showAlert('formLoginHome', 'Usuario o contraseña incorrectos.');
+    // Mostrar estado de carga
+    const submitBtn = $('#formLoginHome button[type="submit"]');
+    const originalText = submitBtn?.textContent;
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Ingresando...';
     }
-  }
 
-  /**
-   * Autentica al usuario contra los usuarios de prueba
-   * @param {string} email - Email
-   * @param {string} password - Contraseña
-   * @returns {Object|null} Usuario autenticado o null
-   * @private
-   */
-  #authenticateUser(email, password) {
-    const normalizedEmail = email.toLowerCase();
-    
-    for (const [, userData] of Object.entries(TEST_USERS)) {
-      if (userData.email === normalizedEmail && userData.password === password) {
-        return {
-          email: userData.email,
-          role: userData.role,
-          name: userData.name
-        };
+    try {
+      // Llamar a la API
+      const response = await api.login(email, password);
+      
+      if (response.success && response.data) {
+        removeAlert('formLoginHome');
+        
+        // Actualizar estado con datos del usuario
+        appState.setUser(response.data.user);
+        
+        console.log(`[AuthModule] Login exitoso: ${response.data.user.full_name}`);
+      }
+
+    } catch (error) {
+      console.error('[AuthModule] Error de login:', error);
+      
+      if (error instanceof ApiError) {
+        showAlert('formLoginHome', error.message);
+      } else {
+        showAlert('formLoginHome', 'Error al conectar con el servidor');
+      }
+    } finally {
+      // Restaurar botón
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
       }
     }
-    
-    return null;
-  }
-
-  /**
-   * Procesa el login exitoso
-   * @param {Object} user - Datos del usuario
-   * @private
-   */
-  #loginSuccess(user) {
-    appState.setUser(user);
-    console.log(`[AuthModule] Login exitoso: ${user.name} (${user.role})`);
   }
 
   /**
    * Maneja el proceso de registro
    * @private
    */
-  #handleRegister() {
+  async #handleRegister() {
     const email = getValue('#registerEmailHome');
     const password = getValue('#registerPasswordHome');
     const userType = getValue('#registerTipoHome');
 
-    // Validación
+    // Validación local
     const validation = validateRegisterForm({ email, password, userType });
     
     if (!validation.isValid) {
@@ -139,41 +128,43 @@ class AuthModule {
       return;
     }
 
-    // Verificar email existente
-    if (this.#isEmailRegistered(email)) {
-      showAlert('formRegisterHome', 'Este correo ya está registrado.');
-      return;
+    // Mostrar estado de carga
+    const submitBtn = $('#formRegisterHome button[type="submit"]');
+    const originalText = submitBtn?.textContent;
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Registrando...';
     }
 
-    removeAlert('formRegisterHome');
+    try {
+      // El registro simple (sin curso) aún no es soportado por la API
+      // Mostrar mensaje para usar el formulario de inscripción
+      showAlert('formRegisterHome', 
+        'Para registrarte, usa el botón "Inscribirse a un curso" y completa el formulario de inscripción.', 
+        'info'
+      );
 
-    // Crear usuario y autenticar
-    const newUser = {
-      email,
-      role: userType,
-      name: email.split('@')[0]
-    };
-
-    this.#loginSuccess(newUser);
-  }
-
-  /**
-   * Verifica si un email ya está registrado
-   * @param {string} email - Email a verificar
-   * @returns {boolean}
-   * @private
-   */
-  #isEmailRegistered(email) {
-    const normalizedEmail = email.toLowerCase();
-    return Object.values(TEST_USERS).some(
-      user => user.email === normalizedEmail
-    );
+    } catch (error) {
+      console.error('[AuthModule] Error de registro:', error);
+      
+      if (error instanceof ApiError) {
+        showAlert('formRegisterHome', error.message);
+      } else {
+        showAlert('formRegisterHome', 'Error al conectar con el servidor');
+      }
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
+    }
   }
 
   /**
    * Cierra la sesión del usuario
    */
   logout() {
+    api.logout();
     appState.clearUser();
     router.refresh();
     console.log('[AuthModule] Sesión cerrada');
@@ -193,7 +184,8 @@ class AuthModule {
    * @returns {boolean}
    */
   isStudent() {
-    return this.hasRole(USER_ROLES.ALUMNO);
+    const role = appState.getUserRole();
+    return role === USER_ROLES.ALUMNO || role === 'student';
   }
 
   /**
@@ -201,7 +193,8 @@ class AuthModule {
    * @returns {boolean}
    */
   isTeacher() {
-    return this.hasRole(USER_ROLES.PROFESOR);
+    const role = appState.getUserRole();
+    return role === USER_ROLES.PROFESOR || role === 'teacher';
   }
 
   /**
@@ -209,7 +202,8 @@ class AuthModule {
    * @returns {boolean}
    */
   isAdmin() {
-    return this.hasRole(USER_ROLES.ADMIN);
+    const role = appState.getUserRole();
+    return role === USER_ROLES.ADMIN || role === 'admin';
   }
 }
 
